@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 3 Hard Quiz – Disease & Homeostasis</title>
+<style>
+:root {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --accent: #38bdf8;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --border: #334155;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+header { width: 100%; max-width: 720px; text-align: center; margin-bottom: 1.5rem; }
+h1 { font-size: 1.6rem; font-weight: 700; }
+.subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 0.25rem; }
+.badge { display: inline-block; background: rgba(239,68,68,0.2); color: #fca5a5; font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 999px; margin-top: 0.4rem; }
+.progress-wrap { width: 100%; max-width: 720px; margin-bottom: 1.25rem; }
+.progress-label { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.35rem; }
+.progress-bar { height: 10px; background: var(--border); border-radius: 999px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--success)); width: 0%; transition: width 0.3s ease; }
+.quiz-container { width: 100%; max-width: 720px; }
+.question-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+.q-num { font-size: 0.8rem; color: var(--accent); font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem; }
+.q-text { font-size: 1.15rem; font-weight: 600; line-height: 1.45; margin-bottom: 1rem; }
+.options { display: flex; flex-direction: column; gap: 0.5rem; }
+.option {
+  background: #0f172a;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  line-height: 1.4;
+}
+.option:hover { border-color: var(--accent); }
+.option.selected { border-color: var(--accent); background: rgba(56,189,248,0.1); }
+.controls { width: 100%; max-width: 720px; display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
+button {
+  flex: 1;
+  min-width: 120px;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-primary { background: var(--accent); color: #0f172a; }
+.btn-secondary { background: var(--border); color: var(--text); }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+.results { text-align: center; padding: 2rem 1rem; display: none; }
+.results h2 { color: var(--success); margin-bottom: 0.5rem; font-size: 1.8rem; }
+.score { font-size: 2.5rem; font-weight: 700; color: var(--accent); margin: 1rem 0; }
+.feedback { color: var(--muted); margin-bottom: 1.5rem; }
+.explain { font-size: 0.9rem; color: #cbd5e1; margin-top: 0.5rem; display: none; }
+@media (max-width: 600px) {
+  .q-text { font-size: 1.05rem; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Unit 3 Hard Quiz</h1>
+  <p class="subtitle">Disease & Homeostasis – Advanced Multiple Choice</p>
+  <div class="badge">Harder Version</div>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-label"><span>Progress</span><span id="progress-text">0 / 0</span></div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+</div>
+
+<div class="quiz-container" id="quiz"></div>
+
+<div class="controls" id="controls">
+  <button class="btn-secondary" id="prev" disabled>Previous</button>
+  <button class="btn-primary" id="next">Next</button>
+  <button class="btn-outline" id="submit" style="display:none;">Submit Quiz</button>
+</div>
+
+<div class="results" id="results">
+  <h2>Quiz Complete!</h2>
+  <div class="score" id="score">0%</div>
+  <p class="feedback" id="feedback"></p>
+  <button class="btn-primary" id="retry">Try Again</button>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "A human cell in G2 of interphase has just completed DNA replication. How many chromatids does it contain?",
+    options: ["23", "46", "92", "184"],
+    answer: 2,
+    explain: "After S phase, each of the 46 chromosomes consists of two sister chromatids, for a total of 92 chromatids."
+  },
+  {
+    q: "Which sequence correctly describes the events of mitosis?",
+    options: [
+      "Prophase → Anaphase → Metaphase → Telophase",
+      "Prophase → Metaphase → Anaphase → Telophase",
+      "Metaphase → Prophase → Anaphase → Telophase",
+      "Telophase → Anaphase → Metaphase → Prophase"
+    ],
+    answer: 1,
+    explain: "The correct order is prophase, metaphase, anaphase, telophase (PMAT)."
+  },
+  {
+    q: "During anaphase, what structure shortens to pull the chromosomes apart?",
+    options: ["Nuclear membrane", "Centrioles", "Spindle fibers", "Cell membrane"],
+    answer: 2,
+    explain: "Spindle fibers shorten, dragging the sister chromatids by their centromeres toward opposite poles."
+  },
+  {
+    q: "Why does a mutation in a single cell have the potential to form a large tumor?",
+    options: [
+      "The cell immediately stops dividing",
+      "The mutated cell multiplies rapidly and the daughter cells inherit the mutation",
+      "Surrounding healthy cells automatically die",
+      "The mutation only affects non-dividing cells"
+    ],
+    answer: 1,
+    explain: "Cancer cells divide uncontrollably, and every daughter cell carries the same mutations."
+  },
+  {
+    q: "Elephants have roughly 20 copies of the TP53 gene. What is the primary advantage of these extra copies?",
+    options: [
+      "Faster DNA replication",
+      "Increased likelihood that damaged cells undergo apoptosis instead of becoming cancerous",
+      "Higher rate of cell division",
+      "Stronger cell membranes"
+    ],
+    answer: 1,
+    explain: "Extra TP53 copies make elephant cells more likely to trigger cell death when DNA damage is detected."
+  },
+  {
+    q: "A red blood cell is placed in a solution and swells until it bursts. The solution was:",
+    options: ["Hypertonic", "Isotonic", "Hypotonic", "Saturated"],
+    answer: 2,
+    explain: "Hypotonic solutions have lower solute concentration outside the cell, so water enters and can cause cytolysis in animal cells."
+  },
+  {
+    q: "Which statement best describes facilitated diffusion?",
+    options: [
+      "It moves molecules against their concentration gradient using ATP",
+      "It uses membrane proteins to help polar or large molecules move down their concentration gradient",
+      "It only moves water",
+      "It requires the nuclear membrane to dissolve"
+    ],
+    answer: 1,
+    explain: "Facilitated diffusion is passive and uses transport proteins for molecules that cannot freely cross the lipid bilayer."
+  },
+  {
+    q: "In diabetes, high blood glucose leads to increased urination because:",
+    options: [
+      "The kidneys stop filtering blood entirely",
+      "Excess glucose in the filtrate osmotically pulls water into the urine",
+      "Insulin directly causes the bladder to empty",
+      "The liver produces too much water"
+    ],
+    answer: 1,
+    explain: "High glucose in the urine draws water with it (osmotic diuresis), causing frequent urination and thirst."
+  },
+  {
+    q: "Which of the following is an example of a negative feedback loop?",
+    options: [
+      "Blood clotting, where one clot accelerates more clotting",
+      "Rising blood glucose triggers insulin release, which lowers blood glucose",
+      "A fever that continues to rise without limit",
+      "Childbirth contractions that get stronger and stronger"
+    ],
+    answer: 1,
+    explain: "Negative feedback returns a variable toward a set point. Insulin lowers blood glucose when it is high."
+  },
+  {
+    q: "How can cancer disrupt homeostasis at the organ-system level?",
+    options: [
+      "By immediately stopping all cell division in the body",
+      "By forming tumors that interfere with organ function and disrupt communication between systems",
+      "By converting all cells into diploid cells",
+      "By making the cell membrane impermeable to everything"
+    ],
+    answer: 1,
+    explain: "Tumors can damage organs, block pathways, and disrupt the coordinated function of organ systems."
+  },
+  {
+    q: "During telophase, which of the following occurs?",
+    options: [
+      "Chromosomes condense and the nuclear membrane dissolves",
+      "Sister chromatids separate and move to opposite poles",
+      "Nuclear membranes re-form and chromosomes begin to unwind",
+      "DNA is replicated"
+    ],
+    answer: 2,
+    explain: "Telophase is essentially the reverse of prophase: nuclei re-form and chromosomes decondense."
+  },
+  {
+    q: "The hydrophobic tails of phospholipids in the cell membrane primarily prevent the free passage of:",
+    options: ["Small nonpolar molecules like O₂", "Ions and polar molecules like glucose", "Carbon dioxide", "Lipid-soluble hormones"],
+    answer: 1,
+    explain: "The hydrophobic core blocks charged and polar molecules, which is why they need transport proteins."
+  },
+  {
+    q: "A cell has just finished cytokinesis. Which statement is true?",
+    options: [
+      "Each daughter cell has half the DNA of the parent cell",
+      "The two daughter cells are genetically identical to each other and to the parent cell",
+      "The nuclear membrane is still dissolved",
+      "Spindle fibers are still attached to the chromosomes"
+    ],
+    answer: 1,
+    explain: "Mitosis + cytokinesis produces two genetically identical daughter cells."
+  },
+  {
+    q: "p53 is often called the 'guardian of the genome.' Its main role is to:",
+    options: [
+      "Directly produce insulin",
+      "Detect DNA damage and either pause the cell cycle for repair or trigger apoptosis",
+      "Form the spindle fibers",
+      "Regulate water balance in the kidneys"
+    ],
+    answer: 1,
+    explain: "p53 is a tumor suppressor that responds to DNA damage by stopping division or initiating cell death."
+  },
+  {
+    q: "Which body system is most directly responsible for regulating blood glucose levels via hormones?",
+    options: ["Nervous system", "Respiratory system", "Endocrine system", "Urinary system"],
+    answer: 2,
+    explain: "The endocrine system (especially the pancreas) secretes insulin and glucagon to regulate blood glucose."
+  }
+];
+
+let current = 0;
+let answers = new Array(questions.length).fill(null);
+
+const quizEl = document.getElementById('quiz');
+const progressFill = document.getElementById('progress-fill');
+const progressText = document.getElementById('progress-text');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+const submitBtn = document.getElementById('submit');
+const controls = document.getElementById('controls');
+const results = document.getElementById('results');
+const scoreEl = document.getElementById('score');
+const feedbackEl = document.getElementById('feedback');
+const retryBtn = document.getElementById('retry');
+
+function updateProgress() {
+  const answered = answers.filter(a => a !== null).length;
+  const pct = (answered / questions.length) * 100;
+  progressFill.style.width = pct + '%';
+  progressText.textContent = `${answered} / ${questions.length}`;
+  prevBtn.disabled = current === 0;
+  nextBtn.style.display = current < questions.length - 1 ? 'block' : 'none';
+  submitBtn.style.display = current === questions.length - 1 ? 'block' : 'none';
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  let html = `<div class="question-card">
+    <div class="q-num">Question ${current + 1} of ${questions.length}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="options">`;
+  q.options.forEach((opt, i) => {
+    const selected = answers[current] === i ? 'selected' : '';
+    html += `<div class="option ${selected}" data-idx="${i}">${opt}</div>`;
+  });
+  html += `</div><div class="explain" id="explain">${q.explain}</div></div>`;
+  quizEl.innerHTML = html;
+
+  quizEl.querySelectorAll('.option').forEach(el => {
+    el.addEventListener('click', () => {
+      answers[current] = parseInt(el.dataset.idx);
+      quizEl.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      updateProgress();
+    });
+  });
+
+  updateProgress();
+}
+
+prevBtn.addEventListener('click', () => {
+  if (current > 0) { current--; renderQuestion(); }
+});
+
+nextBtn.addEventListener('click', () => {
+  if (current < questions.length - 1) { current++; renderQuestion(); }
+});
+
+submitBtn.addEventListener('click', () => {
+  let correct = 0;
+  questions.forEach((q, i) => {
+    if (answers[i] === q.answer) correct++;
+  });
+  const pct = Math.round((correct / questions.length) * 100);
+  scoreEl.textContent = `${pct}%`;
+  feedbackEl.textContent = `You got ${correct} out of ${questions.length} correct.`;
+  quizEl.style.display = 'none';
+  controls.style.display = 'none';
+  results.style.display = 'block';
+});
+
+retryBtn.addEventListener('click', () => {
+  answers = new Array(questions.length).fill(null);
+  current = 0;
+  results.style.display = 'none';
+  quizEl.style.display = 'block';
+  controls.style.display = 'flex';
+  renderQuestion();
+});
+
+renderQuestion();
+</script>
+</body>
+</html>
